@@ -17,22 +17,22 @@ import (
 )
 
 func main() {
-	log.Printf("Starting Server...")
+	log.Print("Starting Server...")
 
 	// Load configuration
-	log.Printf("Loading configuration...")
+	log.Print("Loading configuration...")
 	iat.Initialize()
 
 	router := iat.NewRouter()
 
-	port := os.Getenv("PORT")
+	var port string = os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
 	}
 
-	log.Printf("Configuration loaded")
+	log.Print("Configuration loaded")
 
-	log.Printf("Running on port " + port)
+	log.Printf("Running on port %s", port)
 
 	log.Fatal(http.ListenAndServe(":"+port, router))
 }
