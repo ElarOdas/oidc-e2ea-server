@@ -1,5 +1,3 @@
-# Specify Docker-Compose version:
-version: "3.9"
 
 # Shared Docker Services:
 services:
@@ -63,7 +61,7 @@ services:
 
     # For development:
     build:
-      context: ./                                                 # Use this repository directory as context
+      context: ./images/iat                                                 # Use this repository directory as context
       dockerfile: Dockerfile                                      # Use 'Dockerfile' from context directory
 
     # For both:
