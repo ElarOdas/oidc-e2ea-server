@@ -1,33 +1,45 @@
-#### Build ####
+# syntax=docker/dockerfile:1.4
+FROM --platform=$BUILDPLATFORM golang:1.19 AS builder
 
-# Generate build container
-FROM golang:1.19 AS build
+WORKDIR /code 
 
-# Create working directory for source files
-WORKDIR /app
+ENV CGO_ENABLED 1
+ENV GOOS linux
+ENV GOPATH /go
+ENV GOCACHE /go-build
 
-# Copy source files into container
-COPY go ./go
-COPY *.go .
-COPY go.mod .
-COPY go.sum .
+COPY go.mod go.sum ./
+RUN --mount=type=cache,target=/go/pkg/mod/cache \
+    go mod download
 
-# Download dependencies
-RUN go mod tidy
+COPY . .
 
-# Compile application to single binary file 'iat'
-RUN CGO_ENABLED=1 go build -a -installsuffix cgo -o iat
+RUN --mount=type=cache,target=/go/pkg/mod/cache \
+    --mount=type=cache,target=/go-build \
+    go build -a -ldflags '-linkmode external -extldflags "-static"' -o bin/iat main.go
 
-#### Deploy ####
+CMD ["/code/bin/iat"]
 
-# Generate runtime container
+# ! Dev Environment currently not needed
+# FROM builder as dev-envs
+
+# RUN <<EOF
+# apk update
+# apk add git
+# EOF
+
+# RUN <<EOF
+# addgroup -S docker
+# adduser -S --shell /bin/bash --ingroup docker vscode
+# EOF
+
+# # install Docker tools (cli, buildx, compose)
+# COPY --from=gloursdocker/docker / /
+
+# CMD ["go", "run", "main.go"]
+
 FROM scratch
-
-# Create working directory for binary
-WORKDIR /
-
-# Copy compiled binary from build container
-COPY --from=build /app/iat iat
+COPY --from=builder /code/bin/iat /usr/local/bin/iat
 
 # Set default configuration parameters
 ENV ALG="ES256"
@@ -36,4 +48,4 @@ ENV MAX_TOKEN_PERIOD=2592000
 ENV DB_SQLITE_FILE="/config/db.sqlite"
 
 # Run the binary on start
-CMD ["./iat"]
+CMD ["/usr/local/bin/iat"]
