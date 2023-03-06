@@ -61,8 +61,7 @@ services:
 
     # For development:
     build:
-      context: ./images/iat                                                 # Use this repository directory as context
-      dockerfile: Dockerfile                                      # Use 'Dockerfile' from context directory
+      context: ./images/iat                                                 # Use this repository directory as context                                     # Use 'Dockerfile' from context directory
 
     # For both:
     restart: unless-stopped                                       # Restore last on/off state after restart
