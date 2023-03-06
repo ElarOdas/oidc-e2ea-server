@@ -20,7 +20,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"math/big"
 	"net/http"
@@ -288,7 +288,7 @@ func RequestUserinfo(bearerToken string, uri string, issuer string) (map[string]
 
 func ReadRequestBody(r *http.Request) (string, error) {
 	// Read request body
-	bodyBytes, err := ioutil.ReadAll(r.Body)
+	bodyBytes, err := io.ReadAll(r.Body)
 	if err != nil {
 		return "", errors.New("failed to read request body: " + err.Error())
 	}
@@ -413,8 +413,7 @@ func EdDsaPublicKeyFromJson(jwk map[string]interface{}) (*ed25519.PublicKey, map
 	if err != nil {
 		return nil, nil, errors.New("failed to read x value: " + err.Error())
 	}
-	var publicKey ed25519.PublicKey
-	publicKey = x
+	var publicKey ed25519.PublicKey = x
 	xString, err := StringFromJson(jwk, "x")
 	if err != nil {
 		return nil, nil, errors.New("x value not found: " + err.Error())
@@ -562,21 +561,21 @@ func GenerateIat(privateKey interface{}, algorithm jwt.SigningMethod, tokenClaim
 	expiresIn := config.DefaultTokenPeriod
 	if tokenLifetime, ok := tokenClaims["token_lifetime"]; ok {
 		var popTokenLifetime uint64 = 0
-		switch tokenLifetime.(type) {
+		switch typedTokenLifetime := tokenLifetime.(type) {
 		case string:
 			var err error
-			popTokenLifetime, err = strconv.ParseUint(tokenLifetime.(string), 10, 64)
+			popTokenLifetime, err = strconv.ParseUint(typedTokenLifetime, 10, 64)
 			if err != nil {
 				return "", nil, 0, err
 			}
 		case float64:
-			popTokenLifetime = uint64(tokenLifetime.(float64))
+			popTokenLifetime = uint64(typedTokenLifetime)
 		case int64:
-			popTokenLifetime = uint64(tokenLifetime.(int64))
+			popTokenLifetime = uint64(typedTokenLifetime)
 		case uint64:
-			popTokenLifetime = uint64(tokenLifetime.(uint64))
+			popTokenLifetime = uint64(typedTokenLifetime)
 		default:
-			return "", nil, 0, errors.New("Unexpected type of 'token_lifetime'")
+			return "", nil, 0, errors.New("unexpected type of 'token_lifetime'")
 		}
 		if popTokenLifetime > uint64(config.MaxTokenPeriod) {
 			expiresIn = uint64(config.MaxTokenPeriod)
