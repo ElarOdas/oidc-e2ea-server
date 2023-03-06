@@ -9,61 +9,15 @@
 package iat
 
 import (
-	"net/http"
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 )
 
-// Gorilla free Router
-func NewRouter() (router *http.ServeMux) {
-	router = http.NewServeMux()
-	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		switch r.Method {
-		case http.MethodPost:
-			GenIat(w, r)
-		case http.MethodOptions:
-			IatOptions(w, r)
-		}
-	},
-	)
+// Chi free Router
+func NewRouter() (router *chi.Mux) {
+	router = chi.NewRouter()
+	router.Use(middleware.Logger)
+	router.Post("/", GenIat)
+	router.Options("/", IatOptions)
 	return
 }
-
-// type Route struct {
-// 	Name        string
-// 	Method      string
-// 	Pattern     string
-// 	HandlerFunc http.HandlerFunc
-// }
-
-// type Routes []Route
-
-// func NewRouter() *mux.Router {
-// 	router := mux.NewRouter().StrictSlash(true)
-// 	for _, route := range routes {
-// 		var handler http.Handler
-// 		handler = route.HandlerFunc
-// 		handler = Logger(handler, route.Name)
-
-// 		router.
-// 			Methods(route.Method).
-// 			Path(route.Pattern).
-// 			Name(route.Name).
-// 			Handler(handler)
-// 	}
-
-// 	return router
-// }
-
-// var routes = Routes{
-// 	Route{
-// 		"GenIat",
-// 		strings.ToUpper("Post"),
-// 		"/",
-// 		GenIat,
-// 	},
-// 	Route{
-// 		"IatOptions",
-// 		strings.ToUpper("Options"),
-// 		"/",
-// 		IatOptions,
-// 	},
-// }
