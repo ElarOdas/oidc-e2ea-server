@@ -1,6 +1,7 @@
 #!/bin/bash
 
 SECRETS_DIR="./.secrets/"
+CERTS_DIR="${SECRETS_DIR}/certs"
 PRIVATE_KEY_FILE="${SECRETS_DIR}private.pem"
 DB_USERNAME_FILE="${SECRETS_DIR}db_username.txt"
 DB_PASSWORD_FILE="${SECRETS_DIR}db_password.txt"
@@ -23,6 +24,8 @@ function generate_secret {
 
 # Create secrets directory if not exists
 [ ! -d "$SECRETS_DIR" ] && mkdir "$SECRETS_DIR"
+# Create certs directory if not exists
+[ ! -d "$CERTS_DIR" ] && mkdir "$CERTS_DIR"
 
 # Create private key file if not exists
 [ ! -f "$PRIVATE_KEY_FILE" ] && openssl genrsa -out "$PRIVATE_KEY_FILE" 2048

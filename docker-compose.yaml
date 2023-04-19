@@ -61,13 +61,13 @@ services:
       - ./keycloak:/opt/keycloak/data/import:ro
   # ICT endpoint for Keycloak (this Go application):
   ict:
-    # For testing:
-    image: jonasprimbs/oidc-e2ea-server:latest                    # Use latest image from Docker Hub
+    # # For testing:
+    # image: jonasprimbs/oidc-e2ea-server:latest                    # Use latest image from Docker Hub
 
     # For development:
-    # build:
-    #   context: ./                                                 # Use this repository directory as context
-    #   dockerfile: Dockerfile                                      # Use 'Dockerfile' from context directory
+    build:
+      context: ./                                                 # Use this repository directory as context
+      dockerfile: Dockerfile                                      # Use 'Dockerfile' from context directory
 
     # For both:
     restart: unless-stopped                                       # Restore last on/off state after restart
@@ -88,12 +88,12 @@ services:
         traefik.http.middlewares.ict.replacepathregex.replacement=$$1
     environment:
       KEY_FILE: /run/secrets/op_private_key                       # Set private key file to Docker Secret 'op_private_key'
-      ALG: RS256                                                  # Configure RSA with SHA256 (RS256) as signature algorithm for ID Assertion Tokens
+      ALG: RS256                                                  # Configure RSA with SHA256 (RS256) as signature algorithm for ID Certifcation Tokens
       USERINFO: >-                                                # Configure userinfo endpoint ('op' is the Docker-internal hostname of OpenID Provider service)
         http://op:8080/realms/ict/protocol/openid-connect/userinfo
-      ISSUER: http://${OP_HOST}/realms/ict                        # Configure issuer of issued ID Assertion Tokens
-      DEFAULT_TOKEN_PERIOD: 3600                                  # Configure the default lifetime of issued ID Assertion Tokens in seconds (3600s = 1h)
-      MAX_TOKEN_PERIOD: 2592000                                   # Configure the maximum lifetime of issued ID Assertion Tokens in seconds (2592000s = 30d)
+      ISSUER: http://${OP_HOST}/realms/ict                        # Configure issuer of issued ID Certifcation Tokens
+      DEFAULT_TOKEN_PERIOD: 3600                                  # Configure the default lifetime of issued ID Certifcation Tokens in seconds (3600s = 1h)
+      MAX_TOKEN_PERIOD: 2592000                                   # Configure the maximum lifetime of issued ID Certifcation Tokens in seconds (2592000s = 30d)
       PORT: 8080                                                  # Configure the internal port on which the ICT endpoint is listening
     env_file:
       - ./.secrets/ict.env                                        # Include secrets from generated environment variables
@@ -187,13 +187,13 @@ services:
       - op2_templates:/templates
   # ICT endpoint for WSO2 (this Go application):
   ict2:
-    # For testing:
-    image: jonasprimbs/oidc-e2ea-server:latest                    # Use latest image from Docker Hub
+    # # For testing:
+    # image: jonasprimbs/oidc-e2ea-server:latest                    # Use latest image from Docker Hub
 
     # For development:
-    # build:
-    #   context: ./                                                 # Use this repository directory as context
-    #   dockerfile: Dockerfile                                      # Use 'Dockerfile' from context directory
+    build:
+      context: ./                                                 # Use this repository directory as context
+      dockerfile: Dockerfile                                      # Use 'Dockerfile' from context directory
 
     # For both:
     restart: unless-stopped                                       # Restore last on/off state after restart
@@ -214,11 +214,11 @@ services:
         traefik.http.middlewares.ict2.replacepathregex.replacement=$$1
     environment:
       KEY_FILE: /run/secrets/op2_private_key                      # Set private key file to Docker Secret 'op_private_key'
-      ALG: RS256                                                  # Configure RSA with SHA256 (RS256) as signature algorithm for ID Assertion Tokens
+      ALG: RS256                                                  # Configure RSA with SHA256 (RS256) as signature algorithm for ID Certifcation Tokens
       USERINFO: http://op2:9000/application/o/userinfo            # Configure userinfo endpoint ('op' is the Docker-internal hostname of OpenID Provider service)
-      ISSUER: http://${OP2_HOST}/                                 # Configure issuer of issued ID Assertion Tokens
-      DEFAULT_TOKEN_PERIOD: 3600                                  # Configure the default lifetime of issued ID Assertion Tokens in seconds (3600s = 1h)
-      MAX_TOKEN_PERIOD: 2592000                                   # Configure the maximum lifetime of issued ID Assertion Tokens in seconds (2592000s = 30d)
+      ISSUER: http://${OP2_HOST}/                                 # Configure issuer of issued ID Certifcation Tokens
+      DEFAULT_TOKEN_PERIOD: 3600                                  # Configure the default lifetime of issued ID Certifcation Tokens in seconds (3600s = 1h)
+      MAX_TOKEN_PERIOD: 2592000                                   # Configure the maximum lifetime of issued ID Certifcation Tokens in seconds (2592000s = 30d)
       PORT: 8080                                                  # Configure the internal port on which the ICT endpoint is listening
     env_file:
       - ./.secrets/ict2.env                                       # Include secrets from generated environment variables
